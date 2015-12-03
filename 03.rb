@@ -16,51 +16,45 @@ end
 
 puts "Enter the directions and press return: "
 
-## Problem 1...
-grid = Grid.new
 dirs = gets.chomp
-x,y = 9999,9999
-grid.visit(x, y)
-dirs.chars.each do |d|
-  case d
-    when '^'
-      y -= 1
-    when 'v'
-      y += 1
-    when '>'
-      x += 1
-    when '<'
-      x -= 1
+
+# Large value is set to 9999 as we start there, this is horrible as it means we have to waste a lot of cycles when counting...
+def houses_visited(directions, num_visitors, large_value=9999)
+  # Directions are ordered, e.g. if 2 visitors, #0=#0, #1=#1, #2=#0, #3=#1, etc.
+
+  grid = Grid.new
+  x,y = [],[]
+
+  num_visitors.times do |i|
+    x[i], y[i] = large_value, large_value
+    grid.visit(x[i], y[i])
   end
-  grid.visit(x, y)
+
+  directions.chars.each_with_index do |d,i|
+    idx = i % num_visitors
+    case d
+      when '^'
+        y[idx] -= 1
+      when 'v'
+        y[idx] += 1
+      when '>'
+        x[idx] += 1
+      when '<'
+        x[idx] -= 1
+    end
+    grid.visit(x[idx], y[idx])
+  end
+
+  grid.houses.inject(0){|s, r| s + (r.nil?? 0: r.count{|i| !i.nil?})}
 end
 
-# How many houses receive at least one present?
-puts "Number of houses visited: #{grid.houses.inject(0){|s, r| s + (r.nil?? 0: r.select{|i| !i.nil?}.length)}}"
-
-
-## Problem 2 (could DRY this up but not worth it for this...)
-grid = Grid.new
-
-x,y = [9999,9999], [9999, 9999]
-
-grid.visit(x[0], y[0])
-grid.visit(x[1],y[1])
-
-dirs.chars.each_with_index do |d,i|
-  idx = i % 2
-  case d
-    when '^'
-      y[idx] -= 1
-    when 'v'
-      y[idx] += 1
-    when '>'
-      x[idx] += 1
-    when '<'
-      x[idx] -= 1
-  end
-  grid.visit(x[idx], y[idx])
-end
+## Problem 1...
 
 # How many houses receive at least one present?
-puts "Number of houses visited: #{grid.houses.inject(0){|s, r| s + (r.nil?? 0: r.select{|i| !i.nil?}.length)}}"
+puts "Number of houses visited: #{houses_visited(dirs, 1)}"
+
+
+## Problem 2 (DRY'd...)
+
+# How many houses receive at least one present?
+puts "Number of houses visited: #{houses_visited(dirs, 2)}"
