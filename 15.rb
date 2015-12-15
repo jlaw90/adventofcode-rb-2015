@@ -29,6 +29,6 @@ scores.sort!{|a,b| a[0] <=> b[0]}
 puts "Problem 1 answer: #{scores.last[0]} (#{scores.last[1].map{|(i,qty)| "#{qty} #{i[:name]}"} * ', '})"
 
 ## Problem 2 - highest scoring with exactly 500 calories...
-scores.select!{|(score, recipe)| recipe.map{|(i, qty)| i[:calories] * qty}.inject(:+) == 500}
+scores.select!{|(score, recipe)| recipe.inject(0){|sum, (i, qty)| sum + i[:calories] * qty} == 500}
 
 puts "Problem 2 answer: #{scores.last[0]} (#{scores.last[1].map{|(i,qty)| "#{qty} #{i[:name]}"} * ', '})"
